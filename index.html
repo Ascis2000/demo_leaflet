@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="./style.css">
+    
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
         <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
@@ -17,10 +18,38 @@
 
 <body>
 
-    <div id="map"></div>
+    <div class="boxMapa">
+        <div id="miPosicion"></div>
+        <div id="map1"></div>
+    </div>
+    
 
+    <div class="boxMapa">
+        <div id="map2"></div>
+        <div id="boxMensaje"></div>
+    </div>
+    
+    <div class="boxMapa">
+        <label>Maginitud:</label>
+        <select id="magnitud">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+        </select>
 
+        <label>Fecha Inicio:</label>
+        <input type="date" id="fInicio">
 
+        <label>Fecha Fin:</label>
+        <input type="date" id="fFin">
+
+        <button id="btn_mostrar">Mostrar Terremotos</button>
+        <div id="map3"></div>
+    </div>
     
     <script src="./script.js"></script>
 </body>
