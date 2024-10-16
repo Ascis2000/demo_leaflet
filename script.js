@@ -65,14 +65,6 @@ pintarDatosPosicion();
 /* *************************************** */
 /* *************************************** */
 
-// Segundo mapa
-var map2 = L.map('map2').setView([40.369, -100.383], 4);
-L.tileLayer('https://tile.osm.ch/switzerland/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map2);
-
-
 // 2. Dibujar en un mapa las coordenadas de posiciones donde hay terremotos
 function getTerremotos(mURL) {
 
@@ -103,6 +95,15 @@ function getTerremotos(mURL) {
 getTerremotos('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson').then(datos => {
     
     console.log(datos);
+    let datosMapa2 = document.getElementById("datosMapa2");
+    datosMapa2.innerHTML = `Total de terremotos al día: ${datos.length}`;
+
+    // Segundo mapa
+    var map2 = L.map('map2').setView([40.369, -100.383], 4);
+    L.tileLayer('https://tile.osm.ch/switzerland/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map2);
 
     datos.forEach(item => {
         let magnitud = item.properties.mag; // Obtener la magnitud del terremoto
@@ -110,7 +111,7 @@ getTerremotos('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day
         const latLng = [coords[1], coords[0]]; // Leaflet usa lat, long en vez de long, lat
 
         // Determinar el color del marcador según la magnitud
-        let markerColor = marcadores(magnitud);
+        let markerColor = getMarkerColors(magnitud);
         let fecha = milisegundosToFecha(item.properties.time);
 
         let cadena = "";
@@ -135,31 +136,20 @@ getTerremotos('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day
 
 // 3. Dibujar en un mapa las coordenadas de posiciones donde hay 
 //terremotos filtrando por magnitud y por fecha de inicio/fin
-
-/* https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson
-    
-    &starttime=2014-01-01
-    &endtime=2014-01-02
-    &minmagnitude=5 */
-
-// Tercer mapa
+// Cargamos el Tercer mapa
 var map3 = L.map('map3').setView([40.369, -100.383], 4);
 L.tileLayer('https://tile.osm.ch/switzerland/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map3);
 
-
-
+// Asociamos un evento onclick para mostrar los marcadores
 let btn_mostrar = document.getElementById("btn_mostrar");
 btn_mostrar.addEventListener("click", function (event) {
 	event.preventDefault();
 
     let fInicio = document.getElementById("fInicio");
     let fFin = document.getElementById("fFin");
-
-    console.log("fInicio=", fInicio.value)
-    console.log("fFin=", fFin.value)
     
     let url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${fInicio.value}&endtime=${fFin.value}&minmagnitude=${magnitud.value}`;
     console.log("url=", url)
@@ -177,7 +167,7 @@ btn_mostrar.addEventListener("click", function (event) {
             let latLng = [coords[1], coords[0]]; // Leaflet usa lat, long
 
             // Determinar el color del marcador según la magnitud
-            let markerColor = marcadores(magnitud);
+            let markerColor = getMarkerColors(magnitud);
 
             //console.log("magnitud=" + magnitud + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin)
             let cadena = "";
@@ -216,30 +206,19 @@ function milisegundosToFecha(msegundos){
     return formattedDate;
 }
 
-function marcadores(magnitud){
+function getMarkerColors(valor){
 
     let markerColor;
-
-    if (magnitud >= 5.0) {
-        // Terremotos graves (marcador rojo)
+    if (valor <= 0.9) {
         markerColor = L.icon({
-            iconUrl: './assets/img/mark_rojo.png',
+            iconUrl: './assets/img/mark_gris.png',
             iconSize: [30, 30],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
             shadowUrl: '',
             shadowSize: [41, 41]
-        });
-    } else if (magnitud >= 3.0 && magnitud <= 4.9) {
-        markerColor = L.icon({
-            iconUrl: './assets/img/mark_yellow.png',
-            iconSize: [30, 30],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowUrl: '',
-            shadowSize: [41, 41]
-        });
-    } else if (magnitud >= 1.9 && magnitud <= 2.9) {
+        }); 
+    } else if (valor > 1.0 && valor <= 1.9) {
         markerColor = L.icon({
             iconUrl: './assets/img/mark_verde.png',
             iconSize: [30, 30],
@@ -248,10 +227,45 @@ function marcadores(magnitud){
             shadowUrl: '',
             shadowSize: [41, 41]
         });
-    } else {
-        // Terremotos suaves (marcador verde)
+    } else if (valor > 2.0 && valor <= 2.9) {
         markerColor = L.icon({
-            iconUrl: './assets/img/mark_azul.png',
+            iconUrl: './assets/img/mark_aceituna.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: '',
+            shadowSize: [41, 41]
+        });
+    } else if (valor > 3.0 && valor <= 3.9) {
+        markerColor = L.icon({
+            iconUrl: './assets/img/mark_yellow.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: '',
+            shadowSize: [41, 41]
+        });
+    } else if (valor > 4.0 && valor <= 4.9) {
+        markerColor = L.icon({
+            iconUrl: './assets/img/mark_platano.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: '',
+            shadowSize: [41, 41]
+        });
+    } else if (valor > 5.0 && valor <= 5.9) {
+        markerColor = L.icon({
+            iconUrl: './assets/img/mark_naranja.png',
+            iconSize: [30, 30],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: '',
+            shadowSize: [41, 41]
+        });
+    } else {
+        markerColor = L.icon({
+            iconUrl: './assets/img/mark_rojo.png',
             iconSize: [30, 30],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
